@@ -62,3 +62,51 @@ Before implementing complex changes:
 - Keep code identifiers in English.
 - Do not assume that generated code is correct.
 - Report uncertainties and unresolved errors.
+
+
+## Frontend Guidelines
+
+- Use React with JavaScript and JSX.
+- Use Tailwind CSS v4 for styling.
+- Use Recharts for dashboard visualizations.
+- Use Lucide React for icons.
+- Use React Router for navigation.
+- Build reusable functional components.
+- Avoid unnecessary dependencies.
+- Keep API requests inside src/services/api.js.
+- Handle loading, error and empty states.
+- Use responsive layouts.
+- Preserve the existing backend API contract.
+
+## FlowBoard Visual Identity
+
+- Modern and minimal SaaS interface.
+- Light background: #F8F9FC.
+- Primary color: violet (#7C3AED).
+- White cards with subtle borders.
+- Rounded corners and clean typography.
+- Professional dashboard layout.
+- Consistent spacing and visual hierarchy.
+
+## Frontend Scope
+
+Pages:
+- Dashboard
+- Tasks (Kanban)
+
+Components:
+- Sidebar
+- StatCard
+- StatusChart
+- TaskCard
+- KanbanBoard
+- TaskForm
+
+## Collaboration Rules
+
+- Plan before complex modifications.
+- Implement one feature at a time.
+- Explain which files will change.
+- Do not modify backend files during frontend tasks.
+- Do not install dependencies without justification.
+- Validate changes with npm run build and npm run lint.
