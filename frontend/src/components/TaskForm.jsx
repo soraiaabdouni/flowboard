@@ -1,4 +1,6 @@
+import { LoaderCircle } from 'lucide-react'
 import { useState } from 'react'
+import { toDateInputValue } from '../utils/date'
 
 const initialValues = {
   title: '',
@@ -15,7 +17,7 @@ function getInitialValues(task) {
     title: task.title || '',
     description: task.description || '',
     priority: task.priority || 'medium',
-    due_date: task.due_date || task.dueDate || '',
+    due_date: toDateInputValue(task.due_date || task.dueDate),
     status: task.status || 'todo',
   }
 }
@@ -87,6 +89,7 @@ export function TaskForm({ task, onSubmit, onCancel, isSaving = false, error = '
           autoFocus
           aria-invalid={Boolean(fieldError('title'))}
           aria-describedby={fieldError('title') ? 'task-title-error' : undefined}
+          disabled={isSaving}
           className="field"
           placeholder="e.g. Plan next sprint"
         />
@@ -98,13 +101,14 @@ export function TaskForm({ task, onSubmit, onCancel, isSaving = false, error = '
 
       <div>
         <label htmlFor="task-description" className="mb-2 block text-sm font-semibold text-slate-700">Description <span className="font-normal text-slate-400">(optional)</span></label>
-        <textarea id="task-description" name="description" value={values.description} onChange={handleChange} rows="3" className="field resize-none" placeholder="Add a short description..." />
+        <textarea id="task-description" name="description" value={values.description} onChange={handleChange} rows="3" className="field resize-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-70" placeholder="Add a short description..." aria-describedby="task-description-hint" disabled={isSaving} />
+        <p id="task-description-hint" className="mt-1 text-xs text-slate-400">Optional, up to the space you need to explain the work.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid min-w-0 gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="task-priority" className="mb-2 block text-sm font-semibold text-slate-700">Priority</label>
-          <select id="task-priority" name="priority" value={values.priority} onChange={handleChange} aria-invalid={Boolean(fieldError('priority'))} className="field">
+          <select id="task-priority" name="priority" value={values.priority} onChange={handleChange} aria-invalid={Boolean(fieldError('priority'))} className="field disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-70" disabled={isSaving}>
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
@@ -114,15 +118,15 @@ export function TaskForm({ task, onSubmit, onCancel, isSaving = false, error = '
 
         <div>
           <label htmlFor="task-due-date" className="mb-2 block text-sm font-semibold text-slate-700">Due date <span className="font-normal text-slate-400">(optional)</span></label>
-          <input id="task-due-date" type="date" name="due_date" value={values.due_date} onChange={handleChange} aria-invalid={Boolean(fieldError('due_date'))} className="field" />
+          <input id="task-due-date" type="date" name="due_date" value={values.due_date} onChange={handleChange} aria-invalid={Boolean(fieldError('due_date'))} className="field disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-70" disabled={isSaving} />
           {fieldError('due_date') && <p className="mt-1 text-xs font-medium text-rose-600">{fieldError('due_date')}</p>}
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 border-t border-slate-100 pt-5">
-        <button type="button" onClick={onCancel} className="button-secondary">Cancel</button>
-        <button type="submit" disabled={isSaving} className="button-primary disabled:cursor-not-allowed disabled:opacity-60">
-          {isSaving ? 'Saving...' : 'Save'}
+      <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
+        <button type="button" onClick={onCancel} disabled={isSaving} className="button-secondary w-full disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">Cancel</button>
+        <button type="submit" disabled={isSaving} aria-busy={isSaving} className="button-primary w-full disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+          {isSaving ? <><LoaderCircle size={16} className="animate-spin" aria-hidden="true" />Saving...</> : 'Save'}
         </button>
       </div>
     </form>

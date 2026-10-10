@@ -4,6 +4,10 @@
   font-family: Inter, Arial, sans-serif;
   color: #202033;
   background: #f8f9fc;
+  --primary: #7c3aed;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --muted: #64748b;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -11,6 +15,7 @@
 body {
   margin: 0;
   min-width: 320px;
+  overflow-x: hidden;
 }
 
 button {
@@ -26,14 +31,57 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@keyframes modal-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@utility motion-modal-overlay {
+  animation: modal-overlay-in 200ms ease-out both;
+}
+
+@utility motion-modal-panel {
+  animation: modal-panel-in 200ms ease-out both;
+}
+
 @utility field {
   @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-violet-400 focus:ring-4 focus:ring-violet-100;
 }
 
 @utility button-primary {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-violet-200 transition hover:bg-violet-700;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-violet-200 transition duration-200 ease-out hover:bg-violet-700 active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-violet-200;
 }
 
 @utility button-secondary {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 transition duration-200 ease-out hover:bg-slate-50 active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-violet-100;
 }
