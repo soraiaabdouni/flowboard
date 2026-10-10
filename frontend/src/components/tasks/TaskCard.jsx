@@ -10,7 +10,7 @@ const priorityStyles = {
 
 const priorityLabels = { low: 'Low', medium: 'Medium', high: 'High' }
 
-export function TaskCard({ task, onEdit, onDelete, onStatusChange }) {
+export function TaskCard({ task, onEdit, onDelete, onStatusChange, readOnly = false }) {
   const [isChangingStatus, setIsChangingStatus] = useState(false)
   const [statusError, setStatusError] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
@@ -48,18 +48,18 @@ export function TaskCard({ task, onEdit, onDelete, onStatusChange }) {
         <span className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${priorityStyles[task.priority]}`}>
           {priorityLabels[task.priority]}
         </span>
-        <select
-          value={task.status}
-          onChange={handleStatusChange}
-          disabled={isChangingStatus}
-          aria-label={`Change status for ${task.title}`}
-          aria-busy={isChangingStatus}
-          className="min-h-11 max-w-[116px] rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-semibold text-slate-500 outline-none transition duration-200 ease-out hover:border-slate-300 focus:border-violet-400 focus:ring-4 focus:ring-violet-100 disabled:cursor-wait disabled:opacity-60"
-        >
-          <option value="todo">To do</option>
-          <option value="in_progress">In progress</option>
-          <option value="done">Done</option>
-        </select>
+        {!readOnly && <select
+            value={task.status}
+            onChange={handleStatusChange}
+            disabled={isChangingStatus}
+            aria-label={`Change status for ${task.title}`}
+            aria-busy={isChangingStatus}
+            className="min-h-11 max-w-[116px] rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-semibold text-slate-500 outline-none transition duration-200 ease-out hover:border-slate-300 focus:border-violet-400 focus:ring-4 focus:ring-violet-100 disabled:cursor-wait disabled:opacity-60"
+          >
+            <option value="todo">To do</option>
+            <option value="in_progress">In progress</option>
+            <option value="done">Done</option>
+          </select>}
       </div>
       {statusError && <p role="alert" className="mt-2 text-xs font-medium text-rose-600">{statusError}</p>}
       {deleteError && <p role="alert" className="mt-2 text-xs font-medium text-rose-600">{deleteError}</p>}
@@ -74,23 +74,23 @@ export function TaskCard({ task, onEdit, onDelete, onStatusChange }) {
           <CalendarDays size={14} className={task.due_date ? 'text-violet-500' : undefined} aria-hidden="true" />
           {formatTaskDueDate(task.due_date)}
         </span>
-        <div className="flex items-center gap-1 opacity-80 transition-opacity group-hover:opacity-100">
-          <button
-            onClick={() => onEdit(task)}
-            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-violet-50 hover:text-violet-600"
-            aria-label={`Edit ${task.title}`}
-          >
-            <Pencil size={15} aria-hidden="true" />
-          </button>
-          <button
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
-            aria-label={`Delete ${task.title}`}
-          >
-            {isDeleting ? <LoaderCircle size={15} className="animate-spin" aria-hidden="true" /> : <Trash2 size={15} aria-hidden="true" />}
-          </button>
-        </div>
+        {!readOnly && <div className="flex items-center gap-1 opacity-80 transition-opacity group-hover:opacity-100">
+            <button
+              onClick={() => onEdit(task)}
+              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-violet-50 hover:text-violet-600"
+              aria-label={`Edit ${task.title}`}
+            >
+              <Pencil size={15} aria-hidden="true" />
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
+              aria-label={`Delete ${task.title}`}
+            >
+              {isDeleting ? <LoaderCircle size={15} className="animate-spin" aria-hidden="true" /> : <Trash2 size={15} aria-hidden="true" />}
+            </button>
+          </div>}
       </div>
     </article>
   )

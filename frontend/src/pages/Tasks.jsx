@@ -3,7 +3,7 @@ import { CheckCircle2 } from 'lucide-react'
 import { KanbanBoard } from '../components/tasks/KanbanBoard'
 import { TaskModal } from '../components/TaskModal'
 
-export function Tasks({ tasks, isLoading, error, onRetry, onCreate, onUpdate, onStatusChange, onDelete }) {
+export function Tasks({ tasks, isLoading, error, onRetry, onCreate, onUpdate, onStatusChange, onDelete, readOnly = false }) {
   const [modalTask, setModalTask] = useState(undefined)
   const [notice, setNotice] = useState('')
 
@@ -29,6 +29,14 @@ export function Tasks({ tasks, isLoading, error, onRetry, onCreate, onUpdate, on
 
   return (
     <div className="space-y-8">
+      {readOnly && (
+        <div
+          role="status"
+          className="rounded-xl border border-violet-100 bg-violet-50 px-4 py-3 text-sm font-medium text-violet-700"
+        >
+          Demo mode — read only
+        </div>
+      )}
       {notice && <div role="status" aria-live="polite" className="flex items-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700"><CheckCircle2 size={17} aria-hidden="true" />{notice}<button className="ml-auto rounded-md px-2 py-1 text-xs underline hover:bg-emerald-100" onClick={() => setNotice('')}>Dismiss</button></div>}
       <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div>
@@ -36,11 +44,11 @@ export function Tasks({ tasks, isLoading, error, onRetry, onCreate, onUpdate, on
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">Tasks</h1>
           <p className="mt-3 text-sm leading-6 text-slate-500 sm:text-base">Plan, organize and track your work.</p>
         </div>
-        <button onClick={() => { setNotice(''); setModalTask(null) }} className="button-primary self-start sm:self-auto">New task</button>
+        {!readOnly && <button onClick={() => { setNotice(''); setModalTask(null) }} className="button-primary self-start sm:self-auto">New task</button>}
       </header>
 
-      <KanbanBoard tasks={tasks} onEdit={setModalTask} onDelete={handleDelete} onStatusChange={handleStatusChange} />
-      {modalTask !== undefined && <TaskModal task={modalTask} onClose={() => setModalTask(undefined)} onSubmit={handleSubmit} />}
+      <KanbanBoard tasks={tasks} onEdit={setModalTask} onDelete={handleDelete} onStatusChange={handleStatusChange} readOnly={readOnly} />
+      {!readOnly && modalTask !== undefined && <TaskModal task={modalTask} onClose={() => setModalTask(undefined)} onSubmit={handleSubmit} />}
     </div>
   )
 }

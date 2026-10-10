@@ -156,3 +156,35 @@ and accessibility without changing existing features.
 - Do not add dependencies without approval
 - Run lint and build after changes
 - Report any regression or unresolved issue
+
+
+## Phase 5 - Production Readiness
+
+Goal: validate and deploy the FlowBoard MVP.
+
+### Production architecture
+- Frontend: Vercel
+- Backend: Render
+- Database: Neon PostgreSQL
+
+### Security requirements
+- Public demo must be read-only.
+- Allow task mutations only in local development.
+- Never expose DATABASE_URL or credentials.
+- Configure CORS with explicit allowed origins.
+- Do not treat CORS as authentication.
+- Keep the production database separate from development.
+- Avoid logging sensitive information.
+
+### Quality requirements
+- Preserve existing CRUD functionality locally.
+- Run backend tests.
+- Run frontend lint and build.
+- Validate API responses and error handling.
+- Review changes before deploying.
+
+### Copilot collaboration
+- Propose changes before implementing.
+- Make incremental modifications.
+- Never deploy automatically.
+- Never delete or migrate production data without approval.

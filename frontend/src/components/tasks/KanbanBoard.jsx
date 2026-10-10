@@ -7,7 +7,7 @@ const columns = [
   { status: 'done', title: 'Done', description: 'Completed work', color: 'bg-emerald-500', tint: 'bg-emerald-50 text-emerald-700', icon: CircleCheck },
 ]
 
-export function KanbanBoard({ tasks, onEdit, onDelete, onStatusChange }) {
+export function KanbanBoard({ tasks, onEdit, onDelete, onStatusChange, readOnly = false }) {
   return (
     <div className="grid items-start gap-5 md:grid-cols-2 xl:grid-cols-3">
       {columns.map((column) => {
@@ -47,6 +47,7 @@ export function KanbanBoard({ tasks, onEdit, onDelete, onStatusChange }) {
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onStatusChange={onStatusChange}
+                    readOnly={readOnly}
                   />
                 ))
               )}
