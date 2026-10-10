@@ -110,3 +110,49 @@ Components:
 - Do not modify backend files during frontend tasks.
 - Do not install dependencies without justification.
 - Validate changes with npm run build and npm run lint.
+
+
+## Current Phase: UI/UX Refinement
+
+The FlowBoard MVP is already functional.
+
+### Main Goal
+Improve visual quality, usability, responsiveness
+and accessibility without changing existing features.
+
+### Preserve
+- Existing API endpoints and HTTP contracts
+- Task CRUD behavior
+- Kanban status updates
+- Dashboard calculations
+- PostgreSQL integration
+- React routes and navigation
+- Existing component responsibilities
+
+### Design Guidelines
+- Modern, minimal and professional SaaS interface
+- Primary violet: #7C3AED
+- Background: #F8F9FC
+- White cards with subtle borders and shadows
+- Consistent spacing and typography
+- Responsive layouts
+- Clear visual feedback for interactions
+
+### UX Guidelines
+- Provide loading and empty states
+- Show feedback after successful actions
+- Display understandable error messages
+- Prevent duplicate submissions
+- Use accessible buttons and forms
+- Respect reduced-motion preferences
+- Avoid unnecessary animations
+
+### AI Collaboration
+- Inspect existing code before changing it
+- Explain proposed changes
+- Modify only files related to the request
+- Prefer CSS and presentation changes
+- Do not change business logic without approval
+- Do not add dependencies without approval
+- Run lint and build after changes
+- Report any regression or unresolved issue
