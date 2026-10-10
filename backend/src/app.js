@@ -2,13 +2,25 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import { taskRoutes } from './routes/tasks.js'
 
-export async function buildApp(db) {
+export async function buildApp(db, options = {}) {
   const app = Fastify({
     logger: true
   })
 
+  const allowedOrigins = (process.env.CORS_ORIGIN || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+
   await app.register(cors, {
-    origin: 'http://localhost:5173',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+        return
+      }
+
+      callback(null, false)
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
   })
 
@@ -22,6 +34,27 @@ export async function buildApp(db) {
       service: 'flowboard-api'
     }
   })
+
+  const readOnly = options.readOnly ||
+    process.env.NODE_ENV === 'production' ||
+    process.env.DEMO_READ_ONLY === 'true'
+
+  app.addHook('onRequest', async (request, reply) => {
+    const writeMethods = ['POST', 'PUT', 'PATCH', 'DELETE']
+    const requestPath = request.url.split('?')[0]
+    const isTaskRoute = requestPath === '/tasks' || requestPath.startsWith('/tasks/')
+
+    if (
+      readOnly &&
+      isTaskRoute &&
+      writeMethods.includes(request.method)
+    ) {
+      return reply.code(403).send({
+        error: 'Public demo is read-only'
+      })
+    }
+  })
+
 
   await app.register(taskRoutes, { db })
 
