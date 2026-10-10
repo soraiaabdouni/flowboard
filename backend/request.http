@@ -1,0 +1,47 @@
+@baseUrl = http://localhost:3000
+
+### Health Check
+GET {{baseUrl}}/health
+
+### List Tasks
+GET {{baseUrl}}/tasks
+
+### Create Task
+# @name createTask
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Create FlowBoard dashboard",
+  "description": "Implement React dashboard",
+  "priority": "high",
+  "due_date": "2026-11-20"
+}
+
+### Get Task By ID
+GET {{baseUrl}}/tasks/{{createTask.response.body.$.id}}
+
+### Update Task
+PUT {{baseUrl}}/tasks/{{createTask.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "title": "Improve FlowBoard dashboard",
+  "description": "Implement cards and charts",
+  "priority": "medium",
+  "due_date": "2026-11-25"
+}
+
+### Update Status
+PATCH {{baseUrl}}/tasks/{{createTask.response.body.$.id}}/status
+Content-Type: application/json
+
+{
+  "status": "in_progress"
+}
+
+### Dashboard Summary
+GET {{baseUrl}}/dashboard/summary
+
+### Delete Task
+DELETE {{baseUrl}}/tasks/{{createTask.response.body.$.id}}
