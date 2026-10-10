@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard'
 import Tasks from './pages/Tasks'
 import { taskService } from './services/api'
 
+const isReadOnlyDemo = import.meta.env.VITE_DEMO_MODE === 'true'
+
 function AppContent() {
   const [tasks, setTasks] = useState([])
   const [summary, setSummary] = useState(null)
@@ -82,7 +84,7 @@ function AppContent() {
     <AppLayout>
       <Routes>
         <Route path="/" element={<Dashboard tasks={tasks} summary={summary} isLoading={isLoading} error={error} onRetry={loadData} />} />
-        <Route path="/tasks" element={<Tasks tasks={tasks} isLoading={isLoading} error={error} onRetry={loadData} onCreate={handleCreate} onUpdate={handleUpdate} onStatusChange={handleStatusChange} onDelete={handleDelete} />} />
+        <Route path="/tasks" element={<Tasks tasks={tasks} isLoading={isLoading} error={error} onRetry={loadData} onCreate={handleCreate} onUpdate={handleUpdate} onStatusChange={handleStatusChange} onDelete={handleDelete} readOnly={isReadOnlyDemo} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppLayout>
