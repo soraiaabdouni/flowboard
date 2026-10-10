@@ -93,8 +93,8 @@ function makeTask(overrides = {}) {
   }
 }
 
-async function withApp(callback, initialTasks = []) {
-  const app = await buildApp(createFakeDb(initialTasks))
+async function withApp(callback, initialTasks = [], options = {}) {
+  const app = await buildApp(createFakeDb(initialTasks), options)
 
   try {
     await callback(app)
@@ -294,4 +294,144 @@ test('GET /dashboard/summary returns task statistics', async () => {
       status: 'done'
     })
   ])
+})
+
+test('public demo allows reads and rejects mutations', async () => {
+  await withApp(async (app) => {
+    const readResponse = await app.inject({
+      method: 'GET',
+      url: '/tasks'
+    })
+    const summaryResponse = await app.inject({
+      method: 'GET',
+      url: '/dashboard/summary'
+    })
+    const writeResponse = await app.inject({
+      method: 'POST',
+      url: '/tasks',
+      payload: { title: 'Não deve ser criada' }
+    })
+
+    assert.equal(readResponse.statusCode, 200)
+    assert.equal(summaryResponse.statusCode, 200)
+    assert.equal(writeResponse.statusCode, 403)
+    assert.deepEqual(writeResponse.json(), {
+      error: 'Public demo is read-only'
+    })
+  }, [], { readOnly: true })
+})
+
+test('public demo keeps CORS preflight available', async () => {
+  const previousOrigin = process.env.CORS_ORIGIN
+  process.env.CORS_ORIGIN = 'http://localhost:5173'
+
+  try {
+    await withApp(async (app) => {
+      const response = await app.inject({
+        method: 'OPTIONS',
+        url: '/tasks',
+        headers: {
+          origin: 'http://localhost:5173',
+          'access-control-request-method': 'POST'
+        }
+      })
+
+      assert.equal(response.statusCode, 204)
+      assert.equal(response.headers['access-control-allow-origin'], 'http://localhost:5173')
+      assert.match(response.headers['access-control-allow-methods'], /POST/)
+    }, [], { readOnly: true })
+  } finally {
+    if (previousOrigin === undefined) {
+      delete process.env.CORS_ORIGIN
+    } else {
+      process.env.CORS_ORIGIN = previousOrigin
+    }
+  }
+})
+
+test('public demo rejects every task mutation method', async () => {
+  await withApp(async (app) => {
+    const requests = [
+      {
+        method: 'POST',
+        url: '/tasks',
+        payload: { title: 'Não deve ser criada' }
+      },
+      {
+        method: 'PUT',
+        url: `/tasks/${taskId}`,
+        payload: {
+          title: 'Não deve ser atualizada',
+          description: null,
+          status: 'todo',
+          priority: 'medium',
+          due_date: null
+        }
+      },
+      {
+        method: 'PATCH',
+        url: `/tasks/${taskId}/status`,
+        payload: { status: 'done' }
+      },
+      {
+        method: 'DELETE',
+        url: `/tasks/${taskId}`
+      }
+    ]
+
+    for (const request of requests) {
+      const response = await app.inject(request)
+      assert.equal(response.statusCode, 403, request.method)
+      assert.deepEqual(response.json(), {
+        error: 'Public demo is read-only'
+      })
+    }
+  }, [makeTask()], { readOnly: true })
+})
+
+test('local mode keeps mutations enabled', async () => {
+  await withApp(async (app) => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/tasks',
+      payload: { title: 'Tarefa local' }
+    })
+
+    assert.equal(response.statusCode, 201)
+  })
+})
+
+test('CORS allows localhost and configured frontend origin', async () => {
+  const previousOrigin = process.env.CORS_ORIGIN
+  process.env.CORS_ORIGIN = 'http://localhost:5173,https://flowboard.vercel.app'
+
+  try {
+    await withApp(async (app) => {
+      const localResponse = await app.inject({
+        method: 'GET',
+        url: '/health',
+        headers: { origin: 'http://localhost:5173' }
+      })
+      const publicResponse = await app.inject({
+        method: 'GET',
+        url: '/health',
+        headers: { origin: 'https://flowboard.vercel.app' }
+      })
+      const unknownResponse = await app.inject({
+        method: 'GET',
+        url: '/health',
+        headers: { origin: 'https://untrusted.example' }
+      })
+
+      assert.equal(localResponse.headers['access-control-allow-origin'], 'http://localhost:5173')
+      assert.equal(publicResponse.headers['access-control-allow-origin'], 'https://flowboard.vercel.app')
+      assert.equal(unknownResponse.headers['access-control-allow-origin'], undefined)
+    })
+  } finally {
+    if (previousOrigin === undefined) {
+      delete process.env.CORS_ORIGIN
+    } else {
+      process.env.CORS_ORIGIN = previousOrigin
+    }
+  }
 })
